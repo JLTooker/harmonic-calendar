@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Harmonic Calendar Converter v3</title>
+    <div class="section" style="font-size: 0.95em; font-family: 'Georgia', serif; color: #cfe8ff; background-color: #1b2a3a; max-width: 620px; margin: 0 auto; border: 1px solid #416788; padding: 1.2em; border-radius: 12px; box-shadow: 0 0 8px #223344;">
+        <img src="o2-icon.png" alt="o2 icon" width="60" style="margin-bottom: 0.5em;">
+        <p><strong>o2 Note (for Human Clarity):</strong><br>
+        This converter simplifies time. The Harmonic Calendar assumes 13 months of 28 days each, plus one “Year Day.” No leap years. No daylight saving. Just harmony.<br><br>
+        As such, when bouncing between Gregorian and Harmonic systems, you may notice a small one-day discrepancy.<br>
+        This is not a malfunction — merely the song of time being sung in a different key.<br><br>
+        Translation: don't worry. The stars still know your name.</p>
+    </div>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #0f1c2e;
+            color: #e0e6ed;
+            text-align: center;
+            padding: 2em;
+        }
+        input, button, select {
+            padding: 0.5em;
+            margin: 0.5em;
+            font-size: 1em;
+            border-radius: 5px;
+            border: none;
+        }
+        button {
+            background-color: #1b3a57;
+            color: white;
+            cursor: pointer;
+        }
+        .output {
+            margin-top: 1.5em;
+            font-size: 1.2em;
+            color: #a9e1f8;
+        }
+        .section {
+            margin-bottom: 2em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Harmonic Calendar Converter v3</h1>
+
+    <div class="section">
+        <h2>Gregorian → Harmonic</h2>
+        <input type="date" id="gregorian">
+        <button onclick="convertToHarmonic()">Convert</button>
+        <div class="output" id="outputHarmonic"></div>
+    </div>
+
+    <div class="section">
+        <h2>Harmonic → Gregorian</h2>
+        <label>Cycle:</label><input type="number" id="cycleInput" value="0" style="width:80px;">
+        <label>Month:</label>
+        <select id="monthInput">
+            <option>Aurion</option><option>Vellum</option><option>Tranquility</option><option>Echo</option>
+            <option>Solace Day</option>
+            <option>Pulse</option><option>Fray</option><option>Lucent</option><option>Halcyon</option>
+            <option>Holo Day</option>
+            <option>Rift</option><option>Quanta</option><option>Nuance</option><option>Meridian</option><option>Weave</option>
+            <option>Cycle Day</option>
+        </select>
+        <label>Day:</label><input type="number" id="dayInput" style="width:80px;">
+        <button onclick="convertToGregorian()">Convert</button>
+        <div class="output" id="outputGregorian"></div>
+    </div>
+
+    <script>
+        const months = [
+            "Aurion", "Vellum", "Tranquility", "Echo", "Solace Day",
+            "Pulse", "Fray", "Lucent", "Halcyon", "Holo Day",
+            "Rift", "Quanta", "Nuance", "Meridian", "Weave", "Cycle Day"
+        ];
+        const daysInMonths = {
+            "Aurion": 29, "Vellum": 29, "Tranquility": 29, "Echo": 29, "Solace Day": 1,
+            "Pulse": 29, "Fray": 29, "Lucent": 29, "Halcyon": 29, "Holo Day": 1,
+            "Rift": 29, "Quanta": 29, "Nuance": 29, "Meridian": 29, "Weave": 29, "Cycle Day": 1
+        };
+
+        function convertToHarmonic() {
+            const input = document.getElementById("gregorian").value;
+            if (!input) {
+                document.getElementById("outputHarmonic").textContent = "Please select a Gregorian date.";
+                return;
+            }
+            const anchor = new Date("2200-01-01");
+            const selected = new Date(input);
+            let daysElapsed = Math.floor((selected - anchor) / (1000 * 60 * 60 * 24));
+            let cycle = 0;
+            if (daysElapsed >= 0) {
+                while (daysElapsed >= 380) {
+                    daysElapsed -= 380;
+                    cycle++;
+                }
+            } else {
+                while (daysElapsed < 0) {
+                    daysElapsed += 380;
+                    cycle--;
+                }
+            }
+            let monthDay = daysElapsed;
+            for (const month of months) {
+                const length = daysInMonths[month];
+                if (monthDay < length) {
+                    const day = length === 1 ? "" : (monthDay + 1);
+                    document.getElementById("outputHarmonic").textContent =
+                        `Harmonic Date: ${month} ${day}, Cycle ${cycle}`;
+                    return;
+                }
+                monthDay -= length;
+            }
+        }
+
+        function convertToGregorian() {
+            const cycle = parseInt(document.getElementById("cycleInput").value, 10);
+            const month = document.getElementById("monthInput").value;
+            const day = parseInt(document.getElementById("dayInput").value, 10);
+            if (!cycle || !month || (daysInMonths[month] > 1 && isNaN(day))) {
+                document.getElementById("outputGregorian").textContent = "Please enter valid Harmonic values.";
+                return;
+            }
+            let daysFromAnchor = cycle * 380;
+            for (const m of months) {
+                if (m === month) break;
+                daysFromAnchor += daysInMonths[m];
+            }
+            if (daysInMonths[month] > 1) {
+                daysFromAnchor += (day - 1);
+            }
+            const anchor = new Date("2200-01-01");
+            const resultDate = new Date(anchor.getTime() + daysFromAnchor * 24 * 60 * 60 * 1000);
+            document.getElementById("outputGregorian").textContent =
+                `Gregorian Date: ${resultDate.toDateString()}`;
+        }
+    </script>
+</body>
+</html>
